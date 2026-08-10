@@ -2,18 +2,27 @@ import psycopg2
 import pandas as pd
 import mlflow
 import mlflow.sklearn
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
 import joblib
 import warnings
 warnings.filterwarnings('ignore')
 
-print("Connexion PostgreSQL...")
+try:
+    from xgboost import XGBClassifier
+    XGBOOST_OK = True
+except:
+    XGBOOST_OK = False
+    print("XGBoost non installe — pip install xgboost")
 
+print("Connexion PostgreSQL...")
 # ============================================================
 # CONNEXION BDD
 # ============================================================
@@ -203,16 +212,157 @@ else:
     print("Pas assez de clients pour K-Means")
 
 # ============================================================
+# MODELE 4 — KNN
+# ============================================================
+
+print("\nEntrainement KNN...")
+
+with mlflow.start_run(run_name="KNN_SVC"):
+
+    knn_params = {
+        "n_neighbors": 5,
+        "metric": "euclidean",
+        "weights": "uniform"
+    }
+
+    knn_model = KNeighborsClassifier(**knn_params)
+    knn_model.fit(X_train, y_train)
+
+    knn_preds = knn_model.predict(X_test)
+    knn_accuracy = accuracy_score(y_test, knn_preds)
+
+    mlflow.log_params(knn_params)
+    mlflow.log_metric("accuracy", knn_accuracy)
+
+    joblib.dump(knn_model, "knn_model.pkl")
+    mlflow.log_artifact("knn_model.pkl")
+
+    print(f"KNN Accuracy : {knn_accuracy:.4f}")
+    print(classification_report(
+        y_test, knn_preds,
+        target_names=['NORMAL', 'MODEREE', 'CRITIQUE']
+    ))
+
+# ============================================================
+# MODELE 5 — LOGISTIC REGRESSION
+# ============================================================
+
+print("\nEntrainement Logistic Regression...")
+
+with mlflow.start_run(run_name="LogisticRegression_SVC"):
+
+    # multi_class supprime dans scikit-learn >= 1.5
+    # lbfgs gere nativement le multiclasse sans ce parametre
+    lr_params = {
+        "max_iter": 500,
+        "random_state": 42,
+        "solver": "lbfgs"
+    }
+
+    lr_model = LogisticRegression(**lr_params)
+    lr_model.fit(X_train, y_train)
+
+    lr_preds = lr_model.predict(X_test)
+    lr_accuracy = accuracy_score(y_test, lr_preds)
+
+    mlflow.log_params(lr_params)
+    mlflow.log_metric("accuracy", lr_accuracy)
+
+    joblib.dump(lr_model, "lr_model.pkl")
+    mlflow.log_artifact("lr_model.pkl")
+
+    print(f"Logistic Regression Accuracy : {lr_accuracy:.4f}")
+    print(classification_report(
+        y_test, lr_preds,
+        target_names=['NORMAL', 'MODEREE', 'CRITIQUE']
+    ))
+
+# ============================================================
+# MODELE 6 — GRADIENT BOOSTING
+# ============================================================
+
+print("\nEntrainement Gradient Boosting...")
+
+with mlflow.start_run(run_name="GradientBoosting_SVC"):
+
+    gb_params = {
+        "n_estimators": 150,
+        "learning_rate": 0.1,
+        "max_depth": 5,
+        "random_state": 42
+    }
+
+    gb_model = GradientBoostingClassifier(**gb_params)
+    gb_model.fit(X_train, y_train)
+
+    gb_preds = gb_model.predict(X_test)
+    gb_accuracy = accuracy_score(y_test, gb_preds)
+
+    mlflow.log_params(gb_params)
+    mlflow.log_metric("accuracy", gb_accuracy)
+
+    joblib.dump(gb_model, "gb_model.pkl")
+    mlflow.log_artifact("gb_model.pkl")
+
+    print(f"Gradient Boosting Accuracy : {gb_accuracy:.4f}")
+    print(classification_report(
+        y_test, gb_preds,
+        target_names=['NORMAL', 'MODEREE', 'CRITIQUE']
+    ))
+
+# ============================================================
+# MODELE 7 — XGBOOST
+# ============================================================
+
+if XGBOOST_OK:
+    print("\nEntrainement XGBoost...")
+
+    with mlflow.start_run(run_name="XGBoost_SVC"):
+
+        xgb_params = {
+            "n_estimators": 150,
+            "learning_rate": 0.1,
+            "max_depth": 5,
+            "random_state": 42,
+            "eval_metric": "mlogloss"
+        }
+
+        xgb_model = XGBClassifier(**xgb_params)
+        xgb_model.fit(X_train, y_train)
+
+        xgb_preds = xgb_model.predict(X_test)
+        xgb_accuracy = accuracy_score(y_test, xgb_preds)
+
+        mlflow.log_params(xgb_params)
+        mlflow.log_metric("accuracy", xgb_accuracy)
+
+        joblib.dump(xgb_model, "xgb_model.pkl")
+        mlflow.log_artifact("xgb_model.pkl")
+
+        print(f"XGBoost Accuracy : {xgb_accuracy:.4f}")
+        print(classification_report(
+            y_test, xgb_preds,
+            target_names=['NORMAL', 'MODEREE', 'CRITIQUE']
+        ))
+else:
+    xgb_accuracy = 0
+
+# ============================================================
 # RESUME FINAL
 # ============================================================
 
 joblib.dump(rf_model, "svc_model.pkl")
 
 print("\n" + "="*50)
-print("RESUME FINAL — SEMAINE 4")
+print("RESUME FINAL — TOUS LES MODELES")
 print("="*50)
-print(f"  Random Forest : {rf_accuracy:.4f}")
-print(f"  MLP           : {mlp_accuracy:.4f}")
-print("  K-Means       : OK")
-print(f"  MLflow UI     : http://localhost:5000")
+print(f"  Random Forest       : {rf_accuracy:.4f}")
+print(f"  MLP                 : {mlp_accuracy:.4f}")
+print(f"  KNN                 : {knn_accuracy:.4f}")
+print(f"  Logistic Regression : {lr_accuracy:.4f}")
+print(f"  Gradient Boosting   : {gb_accuracy:.4f}")
+if XGBOOST_OK:
+    print(f"  XGBoost             : {xgb_accuracy:.4f}")
+print("  K-Means             : OK")
+print(f"  MLflow UI           : http://localhost:5000")
 print("="*50)
