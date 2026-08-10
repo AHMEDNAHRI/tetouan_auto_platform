@@ -1,4 +1,4 @@
-# 🚗 Plateforme d’Intelligence Commerciale Temps Réel  
+# 🚗 Plateforme d'Intelligence Commerciale Temps Réel  
 ## Tetouan Automobile — Ventes, SAV & RentopCar (LCD/LLD)
 
 ### 👨‍🎓 Réalisé par
@@ -10,7 +10,7 @@ EMSI Tanger — 2026
 
 # 📌 1. Contexte & Problématique
 
-Tetouan Automobile (Concessionnaire officiel Renault & Dacia) dispose de 3 pôles d’activité :
+Tetouan Automobile (Concessionnaire officiel Renault & Dacia) dispose de 3 pôles d'activité :
 
 - ✅ Ventes de véhicules
 - ✅ Service Après-Vente (SAV)
@@ -30,23 +30,68 @@ Développer une **plateforme temps réel** capable de :
 - Unifier les données Ventes + SAV + Location
 - Calculer un Score Valeur Client (SVC)
 - Détecter le risque de churn
-- Générer des alertes automatiques
+- Générer des alertes automatiques (dashboard + email)
 - Fournir des dashboards opérationnels et managériaux
 
 ---
 
-# 🏗 2. Architecture Technique
+# 🏗 2. Architecture Technique — Schéma du Pipeline
 
-### 🔁 Pipeline Temps Réel
-
-Simulateur Python  
-→ Apache Kafka  
-→ Consumer Python (SVC < 500ms)  
-→ PostgreSQL (Bronze / Silver / Gold)  
-→ LSTM + Random Forest + MLP  
-→ Grafana + Power BI  
-→ FastAPI REST  
-→ Apache Airflow (orchestration)
+```
++-----------------------------------------------------------------+
+|                ENVIRONNEMENT LOCAL : CONTENEUR DOCKER           |
+|                                                                   |
+|                 APACHE AIRFLOW (Chef d'orchestre)                |
+|                                                                   |
+|  E - EXTRACTION (3 sources unifiées)                             |
+|  Simulateur Python (schéma réel Tetouan Automobile)              |
+|  - Ventes    : clients, cars, bax_commandes                      |
+|  - SAV       : charges, car_accidents, payments                  |
+|  - RentopCar : car_rentals (LCD/LLD), car_rental_invoices         |
+|                    -> Kafka Producer                              |
+|                    -> Kafka Broker                                |
+|                    -> Kafka Consumer                              |
+|                            |                                      |
+|                            v                                      |
+|  T - TRANSFORMATION (Boucle Critique <= 500ms)                   |
+|  Matrice X(t)          -> NumPy                                   |
+|  Normalisation Z(t)    -> scikit-learn                            |
+|  Fonction SVC          -> NumPy (6 composantes enrichies)         |
+|  RF + MLP + KNN + Reg. Logistique + XGBoost + Gradient Boosting   |
+|                         -> MLflow + scikit-learn + XGBoost         |
+|  Decision finale        -> Python                                 |
+|                            |                                      |
+|                            v                                      |
+|  L - LOAD (Ecriture Asynchrone)                                  |
+|  Bronze -> evenements bruts        -> PostgreSQL                  |
+|  Silver -> donnees nettoyees       -> PostgreSQL                  |
+|  Gold   -> scores SVC + alertes    -> PostgreSQL                  |
+|  LSTM   -> analyse tendances       -> Keras                       |
++====================================|==============================+
+                                      |
+                +---------------------+---------------------+
+                v                                             v
++---------------------------+                +---------------------------+
+|  RESTITUTION VISU         |                |  RESTITUTION API           |
+|  Grafana   (5s)           |                |  FastAPI REST               |
+|  Power BI  (60s)          |                |  Swagger UI                 |
++---------------------------+                +--------------|-------------+
+                                                              v
+                                              +---------------------------+
+                                              |  TUNNEL SECURISE            |
+                                              |  Ngrok / Serveo             |
+                                              |  Encadrant                   |
+                                              |  Tetouan Auto                |
+                                              +--------------|-------------+
+                                                              v
+                                              +---------------------------+
+                                              |  NOTIFICATIONS & FEEDBACK   |
+                                              |  Gmail API (alertes auto)   |
+                                              |  Email Encadrant/Directeur  |
+                                              |  Feedback Loop (retour      |
+                                              |  humain -> réentraînement)  |
+                                              +---------------------------+
+```
 
 ---
 
@@ -57,15 +102,21 @@ Simulateur Python
 | Docker | Conteneurisation complète |
 | Apache Kafka | Streaming temps réel |
 | PostgreSQL | ETL Bronze/Silver/Gold |
-| Random Forest | Détection churn (82%) |
-| MLP | Meilleur modèle (91%) |
+| Random Forest | Détection churn (0.9036) |
+| MLP | Détection churn (0.9877) |
 | LSTM | Détection dérive comportementale |
+| KNN | Modèle de classification (0.9109) |
+| Régression Logistique | ✅ Meilleur modèle (0.9936) |
+| XGBoost | Modèle de boosting (0.9313) |
+| Gradient Boosting | Modèle de boosting (0.9300) |
 | K-Means | Segmentation (VIP / Régulier / Occasionnel / Inactif) |
 | MLflow | Tracking des modèles |
 | FastAPI | API REST |
 | Grafana | Dashboard temps réel |
 | Power BI | Reporting management |
 | Apache Airflow | Orchestration automatique |
+| Ngrok / Serveo | Tunnel sécurisé pour exposer l'API/dashboard |
+| Gmail API | Notifications automatiques par email |
 
 ---
 
@@ -97,13 +148,13 @@ S(t) = Sigmoïde(Σ wi * Zi)
 
 ---
 
-## 🎨 Niveaux d’Alerte
+## 🎨 Niveaux d'Alerte
 
 | Score | Niveau | Action |
 |--------|--------|--------|
 | < 0.50 | ✅ Normal | Aucune action |
-| 0.50 – 0.75 | 🟠 Modéré | Offre ciblée |
-| ≥ 0.75 | 🔴 Critique | Relance urgente |
+| 0.50 – 0.75 | 🟠 Modéré | Offre ciblée + email de notification |
+| ≥ 0.75 | 🔴 Critique | Relance urgente + email immédiat au directeur/encadrant |
 
 ---
 
@@ -140,74 +191,107 @@ Scores SVC + Alertes + Décisions
 
 | Modèle | Performance |
 |--------|------------|
-| Random Forest | 82% |
-| MLP | ✅ 91% |
+| Random Forest | 0.9036 |
+| MLP | 0.9877 |
+| KNN | 0.9109 |
+| Régression Logistique | ✅ 0.9936 (meilleur modèle) |
+| Gradient Boosting | 0.9300 |
+| XGBoost | 0.9313 |
+| K-Means | OK (segmentation validée) |
 | LSTM | Détection dérive progressive |
 
-Tracking via MLflow.
+Tous les modèles sont trackés et comparés via **MLflow** (métriques, hyperparamètres, versions).
 
 ---
 
-# 🔐 8. Sécurité & Bonnes Pratiques
+# 📧 8. Notifications Gmail Automatiques & Feedback Loop
 
-- Secrets externalisés via variables d’environnement
+## 🔔 Notifications Gmail
+- Envoi automatique d'un email via l'API Gmail dès qu'un client atteint un score **Modéré** ou **Critique**
+- Destinataires : Directeur / Encadrant Tetouan Automobile
+- Contenu : score du client, niveau d'alerte, historique résumé, action recommandée
+
+## 🔁 Feedback Loop
+- L'encadrant/directeur peut valider, corriger ou rejeter une alerte reçue
+- Ce retour humain est réinjecté dans le pipeline pour améliorer le réentraînement des modèles
+- Objectif : réduire les faux positifs et affiner le SVC au fil du temps
+
+---
+
+# 🔐 9. Sécurité & Bonnes Pratiques
+
+- Secrets externalisés via variables d'environnement
 - .env non versionné
 - Architecture conteneurisée
 - Données simulées (conformité loi 09‑08)
+- Exposition sécurisée des services locaux (API/Dashboard) via **tunnel Ngrok ou Serveo**
+- Accès restreint pour l'encadrant et Tetouan Automobile uniquement
 
 ---
 
-# ▶️ 9. Lancer le Projet
+# ▶️ 10. Lancer le Projet
 
 ```bash
 docker-compose up -d
+```
 
-# 10. Accès aux Services
-service:Grafana
-url:http://localhost:3000
-Description:Dashboard temps réel
+# 11. Accès aux Services
 
-service:Airflow
-url:http://localhost:8080
-Description:Orchestration des pipelines
+service: Grafana
+url: http://localhost:3000
+Description: Dashboard temps réel
 
-service:MLflow
-url:http://localhost:5000
-Description:Suivi des modèles IA
+service: Airflow
+url: http://localhost:8080
+Description: Orchestration des pipelines
 
-service:FastAPI
-url:http://localhost:8000/docs
-Description:Documentation API Swagger
+service: MLflow
+url: http://localhost:5000
+Description: Suivi des modèles IA
 
-service:PostgreSQL
-url:localhost:5433
-Description:Base de données ETL
+service: FastAPI
+url: http://localhost:8000/docs
+Description: Documentation API Swagger
 
-service:Kafka
-url:localhost:9092
-Description:Broker de streaming
+service: PostgreSQL
+url: localhost:5433
+Description: Base de données ETL
 
-# 11. Résultats Obtenus
+service: Kafka
+url: localhost:9092
+Description: Broker de streaming
+
+service: Ngrok / Serveo
+url: (généré dynamiquement au lancement)
+Description: Tunnel sécurisé pour exposer l'API/Dashboard à l'extérieur
+
+# 12. Résultats Obtenus
 ✅ Pipeline Kafka fonctionnel
 ✅ Score SVC calculé en < 500 ms
 ✅ 4 segments clients intelligents
-✅ Alertes automatiques en temps réel
+✅ 6 modèles IA comparés (RF, MLP, KNN, Reg. Logistique, XGBoost, Gradient Boosting)
+✅ Alertes automatiques en temps réel (dashboard + email)
+✅ Feedback loop pour amélioration continue des modèles
 ✅ Dashboards opérationnels
+✅ Tunnel sécurisé Ngrok/Serveo
 ✅ Architecture industrialisable
 
-# 12.Valeur Ajoutée pour Tetouan Automobile
+# 13. Valeur Ajoutée pour Tetouan Automobile
 
 Avant: Données cloisonnées
-Apres: 	Vue 360° client
+Après: Vue 360° client
 
 Avant: Pas de détection churn
-Apres: Alertes automatiques
+Après: Alertes automatiques (dashboard + email)
 
 Avant: Décisions intuitives
-Apres: IA (91% précision)
+Après: IA (jusqu'à 99.36% précision, 6 modèles comparés)
 
 Avant: Pas de segmentation
-Apres: 4 segments intelligents
+Après: 4 segments intelligents
 
 Avant: Pas de dashboard centralisé
-Apres: Grafana + Power BI
+Après: Grafana + Power BI
+
+Avant: Pas de retour humain sur les alertes
+Après: Feedback loop pour réentraînement continu
