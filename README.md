@@ -265,7 +265,81 @@ service: Ngrok / Serveo
 url: (généré dynamiquement au lancement)
 Description: Tunnel sécurisé pour exposer l'API/Dashboard à l'extérieur
 
-# 12. Résultats Obtenus
+---
+
+# 📸 12. Captures d'écran
+
+<!-- Placez vos images dans un dossier /screenshots à la racine du repo avec exactement ces noms de fichiers -->
+
+### 🎲 Simulateur & Ingestion des données
+
+| Génération des événements (Simulateur) | Réception côté Consumer Kafka |
+|---|---|
+| ![Simulateur](screenshots/simulateur-generation.png) | ![Consumer](screenshots/recu-consumer.png) |
+
+| Modèles Docker |
+|---|
+| ![Docker Models](screenshots/docker-models.png) |
+
+### 🔄 Orchestration — Apache Airflow
+
+| Connexion Airflow | Page d'accueil Airflow |
+|---|---|
+| ![Airflow Login](screenshots/airflow-login.png) | ![Airflow Home](screenshots/airflow-home.png) |
+
+| Graphe du DAG | Vue Gantt |
+|---|---|
+| ![Airflow Graph](screenshots/airflow-graph.png) | ![Airflow Gantt](screenshots/airflow-gantt.png) |
+
+| Détails d'exécution |
+|---|
+| ![Airflow Details](screenshots/airflow-details.png) |
+
+### 🧠 Suivi des modèles IA — MLflow
+
+| Page d'accueil MLflow | Détails d'une expérimentation |
+|---|---|
+| ![MLflow Home](screenshots/mlflow-home.png) | ![MLflow Experiment](screenshots/mlflow-experiment.png) |
+
+| Comparaison des modèles | Analyse du churn |
+|---|---|
+| ![Comparaison Modèles](screenshots/comparaison-models.png) | ![Analyse Churn](screenshots/analyse-churn.png) |
+
+| Segmentation K-Means |
+|---|
+| ![Segmentation K-Means](screenshots/segmentation-kmeans.png) |
+
+### 📊 Dashboards — Grafana & Power BI
+
+| Connexion Grafana | Page d'accueil Grafana |
+|---|---|
+| ![Grafana Login](screenshots/grafana-login.png) | ![Grafana Home](screenshots/grafana-home.png) |
+
+| Dashboard principal | Vue Executive Overview |
+|---|---|
+| ![Dashboard Grafana](screenshots/dashboard-grafana.png) | ![Executive Overview](screenshots/executive-overview.png) |
+
+| Performance RentopCar / SAV | Activation du tunnel sécurisé |
+|---|---|
+| ![RentopCar SAV Performance](screenshots/rentopcar-sav-performance.png) | ![Activation Tunnel Grafana](screenshots/activation-tunnel-grafana.png) |
+
+| Étape d'activation du tunnel | Grafana via le tunnel |
+|---|---|
+| ![Étape Activation Tunnel](screenshots/etape-d-activation-tunnel-grafana.png) | ![Grafana via Tunnel](screenshots/grafana-via-tunnel.png) |
+
+### 📧 Notifications & Recommandations
+
+| Accès à un email spécifique | Emails reçus |
+|---|---|
+| ![Accès Email Spécifique](screenshots/acces-email-specifique.png) | ![Reçu des Emails](screenshots/recu-des-emails.png) |
+
+| Recommandation commerciale |
+|---|
+| ![Recommandation Commerciale](screenshots/recommendation-commerciale.png) |
+
+---
+
+# 13. Résultats Obtenus
 ✅ Pipeline Kafka fonctionnel
 ✅ Score SVC calculé en < 500 ms
 ✅ 4 segments clients intelligents
@@ -276,7 +350,7 @@ Description: Tunnel sécurisé pour exposer l'API/Dashboard à l'extérieur
 ✅ Tunnel sécurisé Ngrok/Serveo
 ✅ Architecture industrialisable
 
-# 13. Valeur Ajoutée pour Tetouan Automobile
+# 14. Valeur Ajoutée pour Tetouan Automobile
 
 Avant: Données cloisonnées
 Après: Vue 360° client
