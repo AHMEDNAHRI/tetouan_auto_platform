@@ -323,9 +323,9 @@ Description: Tunnel sécurisé pour exposer l'API/Dashboard à l'extérieur
 |---|---|
 | ![RentopCar SAV Performance](screenshots/rentopcar-sav-performance.png) | ![Activation Tunnel Grafana](screenshots/activation-tunnel-grafana.png) |
 
-| Étape d'activation du tunnel | Grafana via le tunnel |
-|---|---|
-| ![Étape Activation Tunnel](screenshots/etape-d-activation-tunnel-grafana.png) | ![Grafana via Tunnel](screenshots/grafana-via-tunnel.png) |
+| Grafana via le tunnel |
+|---|
+| ![Grafana via Tunnel](screenshots/grafana-via-tunnel.png) |
 
 ### 📧 Notifications & Recommandations
 
