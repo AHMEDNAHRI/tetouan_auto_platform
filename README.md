@@ -275,67 +275,67 @@ Description: Tunnel sécurisé pour exposer l'API/Dashboard à l'extérieur
 
 | Génération des événements (Simulateur) | Réception côté Consumer Kafka |
 |---|---|
-| ![Simulateur](screenshots/simulateur-generation.png) | ![Consumer](screenshots/recu-consumer.png) |
+| ![Simulateur](screenshots/simulateur-generation.PNG) | ![Consumer](screenshots/recu-consumer.PNG) |
 
 | Modèles Docker |
 |---|
-| ![Docker Models](screenshots/docker-models.png) |
+| ![Docker Models](screenshots/docker-models.PNG) |
 
 ### 🔄 Orchestration — Apache Airflow
 
 | Connexion Airflow | Page d'accueil Airflow |
 |---|---|
-| ![Airflow Login](screenshots/airflow-login.png) | ![Airflow Home](screenshots/airflow-home.png) |
+| ![Airflow Login](screenshots/airflow-login.PNG) | ![Airflow Home](screenshots/airflow-home.PNG) |
 
 | Graphe du DAG | Vue Gantt |
 |---|---|
-| ![Airflow Graph](screenshots/airflow-graph.png) | ![Airflow Gantt](screenshots/airflow-gantt.png) |
+| ![Airflow Graph](screenshots/airflow-graph.PNG) | ![Airflow Gantt](screenshots/airflow-gantt.PNG) |
 
 | Détails d'exécution |
 |---|
-| ![Airflow Details](screenshots/airflow-details.png) |
+| ![Airflow Details](screenshots/airflow-details.PNG) |
 
 ### 🧠 Suivi des modèles IA — MLflow
 
 | Page d'accueil MLflow | Détails d'une expérimentation |
 |---|---|
-| ![MLflow Home](screenshots/mlflow-home.png) | ![MLflow Experiment](screenshots/mlflow-experiment.png) |
+| ![MLflow Home](screenshots/mlflow-home.PNG) | ![MLflow Experiment](screenshots/mlflow-experiment.PNG) |
 
 | Comparaison des modèles | Analyse du churn |
 |---|---|
-| ![Comparaison Modèles](screenshots/comparaison-models.png) | ![Analyse Churn](screenshots/analyse-churn.png) |
+| ![Comparaison Modèles](screenshots/comparaison-models.PNG) | ![Analyse Churn](screenshots/analyse-churn.PNG) |
 
 | Segmentation K-Means |
 |---|
-| ![Segmentation K-Means](screenshots/segmentation-kmeans.png) |
+| ![Segmentation K-Means](screenshots/segmentation-kmeans.PNG) |
 
 ### 📊 Dashboards — Grafana & Power BI
 
 | Connexion Grafana | Page d'accueil Grafana |
 |---|---|
-| ![Grafana Login](screenshots/grafana-login.png) | ![Grafana Home](screenshots/grafana-home.png) |
+| ![Grafana Login](screenshots/grafana-login.PNG) | ![Grafana Home](screenshots/grafana-home.PNG) |
 
 | Dashboard principal | Vue Executive Overview |
 |---|---|
-| ![Dashboard Grafana](screenshots/dashboard-grafana.png) | ![Executive Overview](screenshots/executive-overview.png) |
+| ![Dashboard Grafana](screenshots/dashboard-grafana.PNG) | ![Executive Overview](screenshots/executive-overview.PNG) |
 
 | Performance RentopCar / SAV | Activation du tunnel sécurisé |
 |---|---|
-| ![RentopCar SAV Performance](screenshots/rentopcar-sav-performance.png) | ![Activation Tunnel Grafana](screenshots/activation-tunnel-grafana.png) |
+| ![RentopCar SAV Performance](screenshots/rentopcar-sav-performance.PNG) | ![Activation Tunnel Grafana](screenshots/activation-tunnel-grafana.PNG) |
 
 | Grafana via le tunnel |
 |---|
-| ![Grafana via Tunnel](screenshots/grafana-via-tunnel.png) |
+| ![Grafana via Tunnel](screenshots/grafana-via-tunnel.PNG) |
 
 ### 📧 Notifications & Recommandations
 
 | Accès à un email spécifique | Emails reçus |
 |---|---|
-| ![Accès Email Spécifique](screenshots/acces-email-specifique.png) | ![Reçu des Emails](screenshots/recu-des-emails.png) |
+| ![Accès Email Spécifique](screenshots/acces-email-specifique.jpeg) | ![Reçu des Emails](screenshots/recu-des-emails.jpeg) |
 
 | Recommandation commerciale |
 |---|
-| ![Recommandation Commerciale](screenshots/recommendation-commerciale.png) |
+| ![Recommandation Commerciale](screenshots/recommendation-commerciale.PNG) |
 
 ---
 
